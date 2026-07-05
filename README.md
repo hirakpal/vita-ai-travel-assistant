@@ -31,9 +31,19 @@ cp .env.example .env   # fill in your chosen LLM provider's API key
 streamlit run app.py
 ```
 
-Set `LLM_PROVIDER` in `.env` to `openai`, `gemini`, or `anthropic`, along with
-the matching API key and `LLM_MODEL`. Embeddings run locally via
-`sentence-transformers` by default, so the knowledge base works offline.
+Set `LLM_PROVIDER` in `.env` to `openai`, `gemini`, `anthropic`, or
+`openrouter`, along with the matching API key and `LLM_MODEL`. If
+`LLM_PROVIDER` is left blank, it is inferred from whichever API key is set.
+Embeddings run locally via `sentence-transformers` by default, so the
+knowledge base works offline.
+
+Optionally set `GOOGLE_MAPS_API_KEY` to let the transportation guardrail look
+up real point-to-point distances (via the Distance Matrix API) instead of a
+placeholder value; it's skipped gracefully if unset.
+
+When deploying on Streamlit Community Cloud, add these as Streamlit secrets
+(Settings → Secrets) instead of a `.env` file — `config/settings.py` reads
+from `st.secrets` automatically when environment variables aren't set.
 
 ## Running Tests
 

@@ -15,6 +15,8 @@ class LLMClient:
             return self._chat_gemini(system_prompt, messages)
         if self.provider == "anthropic":
             return self._chat_anthropic(system_prompt, messages)
+        if self.provider == "openrouter":
+            return self._chat_openrouter(system_prompt, messages)
         raise ValueError(f"Unsupported LLM provider: {self.provider}")
 
     def _chat_openai(self, system_prompt: str, messages: list[dict]) -> str:
@@ -48,3 +50,16 @@ class LLMClient:
             messages=messages,
         )
         return response.content[0].text
+
+    def _chat_openrouter(self, system_prompt: str, messages: list[dict]) -> str:
+        from openai import OpenAI
+
+        client = OpenAI(
+            api_key=settings.openrouter_api_key,
+            base_url="https://openrouter.ai/api/v1",
+        )
+        response = client.chat.completions.create(
+            model=self.model,
+            messages=[{"role": "system", "content": system_prompt}, *messages],
+        )
+        return response.choices[0].message.content

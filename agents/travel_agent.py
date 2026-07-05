@@ -7,6 +7,7 @@ from guardrails.persona import build_system_prompt
 from guardrails.transportation import TransportContext, recommend_transport
 from models.trip import Itinerary, TripInfo
 from services.llm_client import LLMClient
+from services.maps_service import get_distance_km
 from services.retrieval_engine import retrieve_context
 
 RETRIEVAL_STAGES = {
@@ -44,7 +45,13 @@ class TravelAgent:
 
         # 4. Apply the transportation guardrail once we reach that stage.
         if state.stage == ConversationStage.TRANSPORTATION_PLANNING and not itinerary.transportation:
-            suggestion = recommend_transport(TransportContext(distance_km=50))
+            distance_km = get_distance_km(trip_info.departure_city, trip_info.destination)
+            suggestion = recommend_transport(
+                TransportContext(
+                    distance_km=distance_km if distance_km is not None else 800,
+                    group_size=trip_info.travelers_count or 1,
+                )
+            )
             itinerary.transportation.append(suggestion)
 
         # 5. Build the system prompt from the persona + stage guardrails.
