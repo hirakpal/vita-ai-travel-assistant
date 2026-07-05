@@ -25,6 +25,10 @@ rationale): a specific point-to-point journey and transport mode the \
 traveler has confirmed/chosen, if any.
 - itinerary_days (list of strings): one entry per day the traveler has \
 agreed to a day-by-day plan for, each summarizing that day's plan.
+- budget_deferred (boolean): true if the traveler explicitly asks VITA to \
+decide/estimate/figure out the budget instead of stating a number \
+themselves (e.g. "help me decide the budget based on activities"). Omit \
+if the traveler has stated (or will state) an actual budget figure.
 
 Conversation:
 {conversation}

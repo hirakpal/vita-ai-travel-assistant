@@ -6,7 +6,7 @@ from guardrails.conversation_flow import get_stage_instruction
 from guardrails.persona import build_system_prompt
 from guardrails.transportation import TransportContext, recommend_transport
 from models.trip import Itinerary, TripInfo
-from services.budget_estimator import estimate_budget
+from services.budget_estimator import estimate_budget, format_budget_string
 from services.llm_client import LLMClient
 from services.maps_service import get_distance_km
 from services.retrieval_engine import retrieve_context
@@ -49,6 +49,13 @@ class TravelAgent:
             for day in itinerary_days:
                 if day and day not in itinerary.daily_plans:
                     itinerary.daily_plans.append(day)
+
+        # If the traveler has asked VITA to decide the budget rather than
+        # stating one, auto-fill it from a preliminary estimate so the
+        # mandatory-info gate isn't stuck waiting on a number that was
+        # deliberately handed off to us.
+        if trip_info.budget_deferred and not trip_info.budget and trip_info.destination:
+            trip_info.budget = format_budget_string(estimate_budget(trip_info, itinerary))
 
         # 2. Advance the conversation stage if the current stage's gate is met.
         state.advance(trip_info, itinerary)

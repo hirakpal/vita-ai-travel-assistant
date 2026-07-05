@@ -15,7 +15,11 @@ STAGE_INSTRUCTIONS = {
         "Progressively collect the following mandatory details, one or two at a "
         "time, without listing them like a form: destination, departure city, "
         "travel dates, budget, number of travelers, and purpose of travel. Only "
-        "ask about what is still missing: {missing}."
+        "ask about what is still missing: {missing}. If the traveler doesn't "
+        "have a budget figure in mind and asks you to work it out from their "
+        "preferences instead, gather enough about accommodation, dining, and "
+        "transport style to produce a rough estimate rather than insisting on "
+        "a number from them."
     ),
     ConversationStage.PREFERENCE_DISCOVERY: (
         "Discover preferences such as interests, travel style, accommodation "

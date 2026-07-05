@@ -94,6 +94,12 @@ def _transportation_cost(itinerary, currency: str) -> tuple[float, str]:
     return total, basis
 
 
+def format_budget_string(estimate: dict) -> str:
+    """Renders an estimate dict as a short human-readable budget string,
+    used to auto-fill TripInfo.budget when the traveler defers the decision."""
+    return f"~{estimate['currency']} {estimate['total']:,} (auto-estimated by VITA)"
+
+
 def estimate_budget(trip_info, itinerary) -> dict:
     currency = _detect_currency(trip_info.budget, trip_info.destination)
     rates = DEFAULT_RATES.get(currency, DEFAULT_RATES["INR"])

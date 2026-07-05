@@ -2,10 +2,7 @@
 import glob
 import os
 
-import chromadb
-
 from config.settings import settings
-from embeddings.embedder import embed_query, embed_texts
 
 COLLECTION_NAME = "vita_knowledge_base"
 
@@ -24,6 +21,8 @@ class KnowledgeBase:
     """Loads travel documents, embeds them, and supports similarity search."""
 
     def __init__(self, persist_dir: str = None, documents_dir: str = None):
+        import chromadb
+
         self.persist_dir = persist_dir or settings.chroma_persist_dir
         self.documents_dir = documents_dir or settings.documents_dir
         os.makedirs(self.persist_dir, exist_ok=True)
