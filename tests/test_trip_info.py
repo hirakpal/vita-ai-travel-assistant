@@ -30,3 +30,11 @@ def test_update_ignores_none_and_empty():
 
 def test_itinerary_is_empty_by_default():
     assert Itinerary().is_empty()
+
+
+def test_update_rejects_placeholder_values():
+    trip = TripInfo(departure_city="Delhi")
+    trip.update(departure_city="unknown", start_date="TBD", budget="n/a")
+    assert trip.departure_city == "Delhi"
+    assert trip.start_date is None
+    assert trip.budget is None

@@ -39,9 +39,21 @@ class TripInfo:
     def is_mandatory_complete(self) -> bool:
         return not self.missing_mandatory_fields()
 
+    _PLACEHOLDER_VALUES = {
+        "unknown", "n/a", "na", "tbd", "none", "null",
+        "not specified", "not sure", "not provided", "?",
+    }
+
+    def _is_valid(self, value) -> bool:
+        if value in (None, "", []):
+            return False
+        if isinstance(value, str) and value.strip().lower() in self._PLACEHOLDER_VALUES:
+            return False
+        return True
+
     def update(self, **kwargs) -> None:
         for key, value in kwargs.items():
-            if hasattr(self, key) and value not in (None, ""):
+            if hasattr(self, key) and self._is_valid(value):
                 setattr(self, key, value)
 
 

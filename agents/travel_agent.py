@@ -32,7 +32,22 @@ class TravelAgent:
         extracted = extract_trip_fields(messages, self.llm)
         if "interests" in extracted and isinstance(extracted["interests"], str):
             extracted["interests"] = [extracted["interests"]]
+        selected_hotel = extracted.pop("selected_hotel", None)
+        confirmed_leg = extracted.pop("confirmed_transport_leg", None)
+        itinerary_days = extracted.pop("itinerary_days", None)
         trip_info.update(**extracted)
+
+        # Opportunistically fold confirmed details into the live itinerary as
+        # soon as the traveler states them, regardless of conversation stage.
+        if selected_hotel and selected_hotel not in itinerary.hotels:
+            itinerary.hotels.append(selected_hotel)
+        if isinstance(confirmed_leg, dict) and confirmed_leg.get("mode"):
+            if confirmed_leg not in itinerary.transportation:
+                itinerary.transportation.append(confirmed_leg)
+        if isinstance(itinerary_days, list):
+            for day in itinerary_days:
+                if day and day not in itinerary.daily_plans:
+                    itinerary.daily_plans.append(day)
 
         # 2. Advance the conversation stage if the current stage's gate is met.
         state.advance(trip_info, itinerary)
@@ -43,7 +58,8 @@ class TravelAgent:
             query = f"{trip_info.destination or ''} {trip_info.interests} {trip_info.transportation_preference or ''}"
             context = retrieve_context(query)
 
-        # 4. Apply the transportation guardrail once we reach that stage.
+        # 4. Apply the transportation guardrail as a baseline suggestion once
+        # we reach that stage, if the traveler hasn't already confirmed a leg.
         if state.stage == ConversationStage.TRANSPORTATION_PLANNING and not itinerary.transportation:
             distance_km = get_distance_km(trip_info.departure_city, trip_info.destination)
             suggestion = recommend_transport(
