@@ -13,7 +13,7 @@ app.py                  Streamlit split-screen entry point
 agents/                 Conversation state machine, slot extraction, orchestrator
 guardrails/             Persona, conversation-flow, and transportation guardrails
 memory/                 Short-term (session) + long-term (JSON) preference memory
-services/               LLM client (pluggable) and RAG retrieval engine
+services/               LLM client (pluggable), RAG retrieval, budget estimator
 embeddings/             Embedding model wrapper (sentence-transformers by default)
 vectordb/               ChromaDB-backed knowledge base
 documents/              Source travel knowledge (destinations, transport, tips)

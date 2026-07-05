@@ -6,6 +6,7 @@ from guardrails.conversation_flow import get_stage_instruction
 from guardrails.persona import build_system_prompt
 from guardrails.transportation import TransportContext, recommend_transport
 from models.trip import Itinerary, TripInfo
+from services.budget_estimator import estimate_budget
 from services.llm_client import LLMClient
 from services.maps_service import get_distance_km
 from services.retrieval_engine import retrieve_context
@@ -70,15 +71,35 @@ class TravelAgent:
             )
             itinerary.transportation.append(suggestion)
 
-        # 5. Build the system prompt from the persona + stage guardrails.
+        # 5. Recompute the budget estimate every turn so it tracks whatever
+        # has been confirmed in the itinerary so far (or the traveler's own
+        # stated budget). Computed before the LLM call so the assistant can
+        # reference the real running total instead of inventing its own.
+        if trip_info.destination:
+            itinerary.estimated_budget = estimate_budget(trip_info, itinerary)
+
+        # 6. Build the system prompt from the persona + stage guardrails.
         system_prompt = build_system_prompt(context)
         stage_instruction = get_stage_instruction(state.stage, trip_info)
         system_prompt += f"\n\nCurrent conversation stage: {state.stage.value}\nInstruction: {stage_instruction}"
+        if itinerary.estimated_budget and state.stage in (
+            ConversationStage.ITINERARY_BUILDING,
+            ConversationStage.SUMMARY,
+            ConversationStage.COMPLETED,
+        ):
+            b = itinerary.estimated_budget
+            system_prompt += (
+                f"\n\nCurrent running budget estimate: {b['currency']} {b['total']:,} total "
+                f"(accommodation {b['currency']} {b['accommodation']:,}, "
+                f"transportation {b['currency']} {b['transportation']:,}, "
+                f"food {b['currency']} {b['food']:,}, activities {b['currency']} {b['activities']:,}). "
+                "Reference these figures rather than inventing your own."
+            )
 
-        # 6. Generate the assistant reply.
+        # 7. Generate the assistant reply.
         reply = self.llm.chat(system_prompt=system_prompt, messages=messages)
 
-        # 7. Update the live itinerary once we are in the building/summary stages.
+        # 8. Update the live itinerary once we are in the building/summary stages.
         if state.stage in (ConversationStage.ITINERARY_BUILDING, ConversationStage.SUMMARY, ConversationStage.COMPLETED):
             if trip_info.destination and not itinerary.trip_summary:
                 itinerary.trip_summary = (
