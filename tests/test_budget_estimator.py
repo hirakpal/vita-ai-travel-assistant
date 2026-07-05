@@ -1,5 +1,5 @@
 from models.trip import Itinerary, TripInfo
-from services.budget_estimator import estimate_budget
+from services.budget_estimator import estimate_budget, format_budget_string
 
 
 def test_estimate_uses_stated_nightly_rate():
@@ -23,3 +23,8 @@ def test_estimate_includes_confirmed_transport_fare():
     itinerary = Itinerary(transportation=[{"mode": "taxi", "fare_estimate": "INR 150-250", "rationale": "confirmed"}])
     result = estimate_budget(trip, itinerary)
     assert result["transportation"] == 200
+
+
+def test_format_budget_string_produces_readable_total():
+    estimate = {"currency": "INR", "total": 45000}
+    assert format_budget_string(estimate) == "~INR 45,000 (auto-estimated by VITA)"

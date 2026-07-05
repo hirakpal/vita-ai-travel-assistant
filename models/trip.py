@@ -22,6 +22,7 @@ class TripInfo:
     food_preference: Optional[str] = None
     accessibility_requirements: Optional[str] = None
     special_requests: Optional[str] = None
+    budget_deferred: bool = False
 
     MANDATORY_FIELDS = (
         "destination",
