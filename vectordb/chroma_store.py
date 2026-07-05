@@ -3,6 +3,7 @@ import glob
 import os
 
 from config.settings import settings
+from embeddings.embedder import embed_query, embed_texts
 
 COLLECTION_NAME = "vita_knowledge_base"
 
