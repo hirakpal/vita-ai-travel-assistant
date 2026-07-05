@@ -38,3 +38,10 @@ def test_update_rejects_placeholder_values():
     assert trip.departure_city == "Delhi"
     assert trip.start_date is None
     assert trip.budget is None
+
+
+def test_update_coerces_numeric_values_for_string_fields():
+    trip = TripInfo()
+    trip.update(budget=5000, destination=2027)
+    assert trip.budget == "5000"
+    assert trip.destination == "2027"

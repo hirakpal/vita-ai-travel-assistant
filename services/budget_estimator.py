@@ -31,10 +31,11 @@ MODE_COST_PER_KM = {
 MODE_FLAT_MINIMUM = {"bus": 30, "metro": 30, "taxi": 100, "ride_hailing": 100, "ferry": 200}
 
 
-def _detect_currency(*texts: str) -> str:
+def _detect_currency(*texts) -> str:
     for text in texts:
         if not text:
             continue
+        text = str(text)
         for symbol, code in CURRENCY_SYMBOLS.items():
             if symbol in text:
                 return code
@@ -44,8 +45,8 @@ def _detect_currency(*texts: str) -> str:
     return "INR"
 
 
-def _extract_numbers(text: str) -> list[float]:
-    return [float(n.replace(",", "")) for n in re.findall(r"[\d,]+(?:\.\d+)?", text or "")]
+def _extract_numbers(text) -> list[float]:
+    return [float(n.replace(",", "")) for n in re.findall(r"[\d,]+(?:\.\d+)?", str(text) if text else "")]
 
 
 def _average(numbers: list[float]) -> float:
@@ -65,7 +66,7 @@ def _parse_nights(trip_info) -> int:
 
 
 def _accommodation_cost(trip_info, itinerary, nights: int, rooms: int, currency: str, rates: dict) -> tuple[float, str]:
-    budget_text = trip_info.budget or ""
+    budget_text = str(trip_info.budget) if trip_info.budget else ""
     numbers = _extract_numbers(budget_text)
     if numbers and "night" in budget_text.lower():
         return _average(numbers) * nights * rooms, "traveler-stated nightly rate"
