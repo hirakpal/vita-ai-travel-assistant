@@ -28,3 +28,12 @@ def test_estimate_includes_confirmed_transport_fare():
 def test_format_budget_string_produces_readable_total():
     estimate = {"currency": "INR", "total": 45000}
     assert format_budget_string(estimate) == "~INR 45,000 (auto-estimated by VITA)"
+
+
+def test_estimate_handles_non_string_budget_without_crashing():
+    # Regression: an LLM extraction can return budget as a bare number (JSON
+    # int) rather than a string; the estimator must not crash on it.
+    trip = TripInfo(destination="Pune, India", start_date="2026-07-25", end_date="2026-07-27", travelers_count=1, budget=5000)
+    result = estimate_budget(trip, Itinerary())
+    assert result["currency"] == "INR"
+    assert result["total"] > 0

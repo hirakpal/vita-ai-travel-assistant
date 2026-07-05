@@ -45,6 +45,13 @@ class TripInfo:
         "not specified", "not sure", "not provided", "?",
     }
 
+    _STRING_FIELDS = (
+        "destination", "departure_city", "start_date", "end_date", "budget",
+        "purpose", "travel_style", "accommodation_preference",
+        "transportation_preference", "food_preference",
+        "accessibility_requirements", "special_requests",
+    )
+
     def _is_valid(self, value) -> bool:
         if value in (None, "", []):
             return False
@@ -54,8 +61,11 @@ class TripInfo:
 
     def update(self, **kwargs) -> None:
         for key, value in kwargs.items():
-            if hasattr(self, key) and self._is_valid(value):
-                setattr(self, key, value)
+            if not hasattr(self, key) or not self._is_valid(value):
+                continue
+            if key in self._STRING_FIELDS and not isinstance(value, str):
+                value = str(value)
+            setattr(self, key, value)
 
 
 @dataclass
