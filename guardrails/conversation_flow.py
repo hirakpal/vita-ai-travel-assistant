@@ -42,11 +42,16 @@ STAGE_INSTRUCTIONS = {
     ConversationStage.ITINERARY_BUILDING: (
         "Summarize the confirmed details into a structured live itinerary "
         "update (trip summary, transportation, hotels, daily plans, "
-        "activities, budget, checklist, packing suggestions)."
+        "activities, budget, checklist, packing suggestions). A running "
+        "budget estimate is being tracked automatically in the itinerary "
+        "panel from confirmed choices (hotel, transport, days) plus "
+        "reasonable defaults for anything not yet decided - mention it "
+        "briefly and note it will keep updating as more is confirmed."
     ),
     ConversationStage.SUMMARY: (
-        "Present a concise final trip summary and ask if the traveler wants to "
-        "adjust anything."
+        "Present a concise final trip summary, including the current "
+        "estimated total budget, and ask if the traveler wants to adjust "
+        "anything."
     ),
     ConversationStage.COMPLETED: (
         "Thank the traveler and let them know the itinerary is ready, offering "

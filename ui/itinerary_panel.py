@@ -37,8 +37,18 @@ def render_itinerary(trip_info: TripInfo, itinerary: Itinerary) -> None:
             st.caption("Not yet built.")
 
     with st.expander("Estimated Budget", expanded=bool(itinerary.estimated_budget)):
-        if itinerary.estimated_budget:
-            st.json(itinerary.estimated_budget)
+        budget = itinerary.estimated_budget
+        if budget:
+            currency = budget["currency"]
+            if trip_info.budget:
+                st.caption(f"Traveler-stated budget: {trip_info.budget}")
+            st.metric(f"Estimated Total ({budget['nights']} nights, {budget['travelers']} traveler(s))", f"{currency} {budget['total']:,}")
+            st.markdown(
+                f"- Accommodation: {currency} {budget['accommodation']:,} — {budget['notes']['accommodation']}\n"
+                f"- Transportation: {currency} {budget['transportation']:,} — {budget['notes']['transportation']}\n"
+                f"- Food: {currency} {budget['food']:,} — {budget['notes']['food']}\n"
+                f"- Activities: {currency} {budget['activities']:,} — {budget['notes']['activities']}"
+            )
         elif trip_info.budget:
             st.write(trip_info.budget)
         else:
